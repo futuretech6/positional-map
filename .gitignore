@@ -1,0 +1,9 @@
+# project output
+bin/
+
+# project config
+compile_commands.json
+compile_flags.txt
+
+# misc
+.DS_Store
