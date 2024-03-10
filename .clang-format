@@ -22,4 +22,3 @@ NamespaceIndentation: All
 BreakInheritanceList: BeforeColon
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 AllowShortBlocksOnASingleLine: Empty
-...
