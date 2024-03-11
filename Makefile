@@ -1,7 +1,7 @@
 .PHONY: default run build clean
 
 SRC_DIR := .
-BIN_DIR := bin/
+BIN_DIR := bin
 
 CXX := g++
 CXXFALGS := -I$(SRC_DIR) -g -std=c++17 -O0 -fsanitize=address
