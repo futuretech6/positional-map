@@ -1,6 +1,6 @@
 .PHONY: default run build clean
 
-SRC_DIR := .
+SRC_DIR := src
 BIN_DIR := bin
 
 CXX := g++
