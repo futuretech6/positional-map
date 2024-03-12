@@ -7,6 +7,7 @@ CXX := g++
 CXXFALGS := -I$(SRC_DIR) -g -std=c++17 -O0 -fsanitize=address
 
 SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+INCS := $(wildcard $(SRC_DIR)/*.h)
 BINS := $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%.out,$(SRCS))
 
 default: run
@@ -18,7 +19,7 @@ run: build
 	done
 
 build: $(BINS)
-$(BIN_DIR)/%.out: $(SRC_DIR)/%.cpp | $(BIN_DIR)
+$(BIN_DIR)/%.out: $(SRC_DIR)/%.cpp $(INCS) | $(BIN_DIR)
 	-$(CXX) $(CXXFALGS) -o $@ $<
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
