@@ -28,4 +28,4 @@ clean:
 	rm -rf $(BIN_DIR)
 
 compile_flags.txt: Makefile
-	echo $(CXX) $(CXXFALGS) | sed 's/ /\n/g' > compile_flags.txt
+	echo $(CXX) $(CXXFALGS) | sed 's/\s\+/\n/g' > compile_flags.txt
