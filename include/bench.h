@@ -1,9 +1,11 @@
 #pragma once
 
+#include "SkipList.h"
 #include <cassert>
 #include <chrono>
 #include <iostream>
 #include <ratio>
+#include <type_traits>
 #include <vector>
 
 extern std::vector<int> random_input;
@@ -39,8 +41,14 @@ void time_find_by_key(T &testMap) {
 template <typename T>
 void time_find_by_pos(T &testMap) {
     auto start_find = std::chrono::high_resolution_clock::now();
-    for (int i = 1; i <= testMap.size(); ++i) {
-        volatile auto it = testMap.find_by_pos(i);
+    if constexpr (std::is_same<T, SkipList<int, int>>()) {
+        for (int pos = 1; pos < testMap.size() + 1; pos++) {
+            volatile auto it = testMap.find_by_pos(pos);
+        }
+    } else {
+        for (int pos = testMap.BASE_INDEX; pos < testMap.size() + testMap.BASE_INDEX; pos++) {
+            volatile auto it = testMap.find_by_pos(pos);
+        }
     }
     auto end_find = std::chrono::high_resolution_clock::now();
 

@@ -2,11 +2,11 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "make binary",
+            "label": "make build",
             "type": "shell",
             "command": "make",
             "args": [
-                "bin/${fileBasenameNoExtension}.out"
+                "build"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

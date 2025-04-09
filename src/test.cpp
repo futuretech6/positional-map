@@ -20,13 +20,11 @@ int main() {
     sort(sorted.begin(), sorted.end());
     auto const &n = input.size();
 
-    auto const target_index_find      = n / 2;
-    auto const target_pos_find_by_pos = n / 2;
-    auto const target_val_erase       = input[n / 2];
+    auto const target_val_erase = input[n / 2];
 
     AvlOrderStatisticTree<int, int> tree;
-    for (auto x : input) {
-        tree.insert(x, x);
+    for (auto val : input) {
+        tree.insert(val, val);
     }
 
     assert(tree.size() == input.size());
@@ -34,11 +32,14 @@ int main() {
     assert(tree.begin()->value == sorted.front());
     assert(tree.last()->value == sorted.back());
 
-    assert(tree.find(input[target_index_find])->value == input[target_index_find]);
-    assert(tree[input[target_index_find]] == input[target_index_find]);
-    assert(tree.at(input[target_index_find]) == input[target_index_find]);
-
-    assert(tree.find_by_pos(target_pos_find_by_pos + 1)->value == sorted[target_pos_find_by_pos]);
+    for (auto const &val : input) {
+        assert(tree.find(val)->value == val);
+        assert(tree[val] == val);
+        assert(tree.at(val) == val);
+    }
+    for (auto pos = tree.BASE_INDEX; pos < n + tree.BASE_INDEX; pos++) {
+        assert(tree.find_by_pos(pos)->value == sorted[pos - tree.BASE_INDEX]);
+    }
 
     print_tree(tree);
 

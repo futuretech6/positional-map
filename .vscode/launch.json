@@ -15,7 +15,7 @@
             },
             "expressions": "native",
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "make binary",
+            "preLaunchTask": "make build",
         },
     ]
 }

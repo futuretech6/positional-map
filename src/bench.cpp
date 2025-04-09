@@ -13,7 +13,13 @@
 int main() {
     using namespace std;
 
-    for (unsigned const size : {1e4, 1e6}) {
+    std::pair<unsigned, unsigned> test_config[] = {
+        {1e3, 100},
+        {1e4, 10},
+        {1e5, 1},
+    };
+
+    for (auto const &[size, iteration_time] : test_config) {
         cout << "[SIZE: " << size << "]" << endl;
 
         init_input(size);
@@ -58,16 +64,6 @@ int main() {
                 time_erase(avl_tree);
                 cout << endl;
             }
-
-            // {
-            //     RbOrderStatisticTree<int, int> rb_tree;
-            //     cout << "RbOrderStatisticTree:" << endl;
-            //     time_insert(rb_tree, input);
-            //     time_find_by_key(rb_tree);
-            //     time_find_by_pos(rb_tree);
-            //     time_erase(rb_tree);
-            //     cout << endl;
-            // }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }

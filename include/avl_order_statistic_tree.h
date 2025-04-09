@@ -8,6 +8,9 @@
 template <typename K, typename V>
 class AvlOrderStatisticTree {
   public:
+    static constexpr int BASE_INDEX = 1;  // the base index of `find_by_pos`
+
+  public:
     // Define for some STL usage
     using key_type        = K;
     using value_type      = V;
@@ -253,15 +256,16 @@ class AvlOrderStatisticTree {
     }
 
     Node *find_by_pos(Node *const node, size_type const &pos) const {
-        auto leftSize = size(node->left);
+        auto const left_size = size(node->left);
+        auto const root_pos  = left_size + BASE_INDEX;
 
-        if (pos == leftSize + 1) {
+        if (pos == root_pos) {
             return node;
         }
-        if (pos <= leftSize) {
+        if (pos < root_pos) {
             return find_by_pos(node->left, pos);
         }
-        return find_by_pos(node->right, pos - leftSize - 1);
+        return find_by_pos(node->right, pos - left_size - 1);
     }
 
     /**
@@ -352,6 +356,8 @@ class AvlOrderStatisticTree {
 
     ~AvlOrderStatisticTree() { free(root); }
 
+    void Depose() { free(root); }
+
     iterator begin() { return iterator(root->min_value_node()); }
     iterator end() { return iterator(nullptr); }
     iterator last() { return iterator(root->max_value_node()); }
@@ -377,11 +383,17 @@ class AvlOrderStatisticTree {
 
     iterator find(key_type const &key) const { return iterator(find(root, key)); }
 
-    iterator find_by_pos(size_type const &k) const {
-        if (k <= 0 || k > size(root)) {
+    /**
+     * @brief Find the node by position
+     *
+     * @param pos position of the node to be found
+     * @note base index decided by `BASE_INDEX`
+     */
+    iterator find_by_pos(size_type const &pos) const {
+        if (pos < BASE_INDEX || pos > size(root)) {
             return iterator(nullptr);
         }
-        return iterator(find_by_pos(root, k));
+        return iterator(find_by_pos(root, pos));
     }
 
     void erase(key_type key) { root = erase(root, key); }
