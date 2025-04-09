@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <utility>
 
@@ -131,7 +132,10 @@ class AvlOrderStatisticTree {
     };
 
   private:
-    Node *root;
+    Node *root = nullptr;
+    // [[deprecated("low performance, use function pointer instead")]] std::function<bool(key_type, key_type)> cmp_func
+    // = std::less<key_type>();
+    bool (*cmp)(key_type, key_type) = nullptr;
 
     /* AVL low-level operations */
 
@@ -199,11 +203,11 @@ class AvlOrderStatisticTree {
             return new Node(key, value);
         }
 
-        if (key < node->key) {
+        if (cmp(key, node->key)) {
             auto new_node    = insert(node->left, key, value);
             node->left       = new_node;
             new_node->parent = node;
-        } else if (key > node->key) {
+        } else if (cmp(node->key, key)) {
             auto new_node    = insert(node->right, key, value);
             node->right      = new_node;
             new_node->parent = node;
@@ -218,7 +222,7 @@ class AvlOrderStatisticTree {
 
         // rotate
         if (auto balance = get_balance(node); balance > 1) {
-            if (key < node->left->key) {
+            if (cmp(key, node->left->key)) {
                 // LL
                 return right_rotate(node);
             } else {
@@ -227,7 +231,7 @@ class AvlOrderStatisticTree {
                 return right_rotate(node);
             }
         } else if (balance < -1) {
-            if (key > node->right->key) {
+            if (cmp(node->right->key, key)) {
                 // RR
                 return left_rotate(node);
             } else {
@@ -246,10 +250,10 @@ class AvlOrderStatisticTree {
             return nullptr;
         }
 
-        if (key < node->key) {
+        if (cmp(key, node->key)) {
             return find(node->left, key);
         }
-        if (key > node->key) {
+        if (cmp(node->key, key)) {
             return find(node->right, key);
         }
         return node;
@@ -280,9 +284,9 @@ class AvlOrderStatisticTree {
             return nullptr;
         }
 
-        if (key < node->key) {
+        if (cmp(key, node->key)) {
             node->left = erase(node->left, key);
-        } else if (key > node->key) {
+        } else if (cmp(node->key, key)) {
             node->right = erase(node->right, key);
         } else {
             if (node->left == nullptr || node->right == nullptr) {
@@ -351,7 +355,11 @@ class AvlOrderStatisticTree {
     }
 
   public:
-    AvlOrderStatisticTree() : root(nullptr) {}
+    static bool less(key_type a, key_type b) { return a < b; }
+    static bool greater(key_type a, key_type b) { return a > b; }
+
+  public:
+    AvlOrderStatisticTree(bool (*cmp)(key_type, key_type) = less) : root(nullptr), cmp(cmp) {}
     AvlOrderStatisticTree(AvlOrderStatisticTree const &) = delete;
 
     ~AvlOrderStatisticTree() { free(root); }
