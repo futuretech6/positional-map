@@ -3,7 +3,9 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <iostream>
 #include <iterator>
+#include <queue>
 #include <utility>
 
 template <typename K, typename V>
@@ -405,4 +407,47 @@ class AvlOrderStatisticTree {
     }
 
     void erase(key_type key) { root = erase(root, key); }
+
+    void print_tree() {
+        std::cout << "-- AVL Order Statistic Tree --" << std::endl;
+        print_tree(root);
+        std::cout << "------------------------------" << std::endl;
+    }
+
+    void print_tree(Node *node) {
+        if (!node)
+            return;
+
+        int height = node->height;
+        int width  = (1 << height) - 1;
+
+        auto res = std::vector(height, std::vector<std::string>(width, " "));
+
+        std::queue<std::pair<Node *, std::pair<int, int>>> q;
+        q.push({node, {0, (width - 1) / 2}});
+
+        while (!q.empty()) {
+            auto p = q.front();
+            q.pop();
+            Node *node = p.first;
+            int r      = p.second.first;
+            int c      = p.second.second;
+
+            res[r][c] = std::to_string(node->value);
+
+            if (node->left) {
+                q.push({node->left, {r + 1, c - (1 << (height - r - 2))}});
+            }
+            if (node->right) {
+                q.push({node->right, {r + 1, c + (1 << (height - r - 2))}});
+            }
+        }
+
+        for (const auto &row : res) {
+            for (const auto &cell : row) {
+                std::cout << cell;
+            }
+            std::cout << std::endl;
+        }
+    }
 };

@@ -6,12 +6,13 @@
 #include "avl_order_statistic_tree.h"
 
 template <typename K, typename V>
-inline void print_tree(AvlOrderStatisticTree<K, V> &tree) {
+inline void print_tree_in_key_order(AvlOrderStatisticTree<K, V> &tree) {
     using namespace std;
+    cout << "key order: {";
     for (auto itor = tree.begin(); itor != tree.end(); ++itor) {
         cout << itor->key << ": " << itor->value << ", ";
     }
-    cout << endl;
+    cout << "}" << endl;
 }
 
 int main() {
@@ -43,15 +44,17 @@ int main() {
             assert(tree.find_by_pos(pos)->value == sorted[pos - tree.BASE_INDEX]);
         }
 
-        print_tree(tree);
+        print_tree_in_key_order(tree);
+        tree.print_tree();
 
         tree.erase(target_val_erase);
         assert(tree.size() == input.size() - 1);
         assert(tree.find(target_val_erase) == tree.end());
 
-        print_tree(tree);
+        print_tree_in_key_order(tree);
+        tree.print_tree();
 
-        cout << "forward tests passed" << endl;
+        cout << "[*] forward tests passed" << endl;
     }
 
     {
@@ -63,10 +66,11 @@ int main() {
         assert(backward_tree.begin()->value == sorted.back());
         assert(backward_tree.last()->value == sorted.front());
 
-        print_tree(backward_tree);
-        cout << "backward tests passed" << endl;
+        print_tree_in_key_order(backward_tree);
+        backward_tree.print_tree();
+        cout << "[*] backward tests passed" << endl;
     }
 
-    cout << "all tests passed" << endl;
+    cout << "[*] all tests passed" << endl;
     return 0;
 }
