@@ -141,18 +141,18 @@ class AvlOrderStatisticTree {
 
     /* AVL low-level operations */
 
-    size_type height(Node const *node) const { return node ? node->height : 0; }
+    static size_type height(Node const *node) { return node ? node->height : 0; }
 
-    size_type size(Node const *node) const { return node ? node->size : 0; }
+    static size_type size(Node const *node) { return node ? node->size : 0; }
 
-    void update(Node *node) {
+    static void update(Node *node) {
         if (node) {
             node->height = 1 + std::max(height(node->left), height(node->right));
             node->size   = 1 + size(node->left) + size(node->right);
         }
     }
 
-    Node *right_rotate(Node *node) {
+    static Node *right_rotate(Node *node) {
         Node *const left       = node->left;
         Node *const left_right = left->right;
 
@@ -174,7 +174,7 @@ class AvlOrderStatisticTree {
         return left;
     }
 
-    Node *left_rotate(Node *node) {
+    static Node *left_rotate(Node *node) {
         Node *const right      = node->right;
         Node *const right_left = right->left;
 
@@ -196,7 +196,7 @@ class AvlOrderStatisticTree {
         return right;
     }
 
-    balance_type get_balance(Node *node) { return node ? height(node->left) - height(node->right) : 0; }
+    static balance_type get_balance(Node *node) { return node ? height(node->left) - height(node->right) : 0; }
 
     /* AVL high-level operations */
 
@@ -348,7 +348,7 @@ class AvlOrderStatisticTree {
         }
     }
 
-    void free(Node *node) {
+    static void free(Node *node) {
         if (node) {
             free(node->left);
             free(node->right);
@@ -414,7 +414,7 @@ class AvlOrderStatisticTree {
         std::cout << "------------------------------" << std::endl;
     }
 
-    void print_tree(Node *node) {
+    static void print_tree(Node *node) {
         if (!node)
             return;
 
