@@ -54,8 +54,8 @@ class AvlOrderStatisticTree {
             return current;
         }
 
-        Node *next() {
-            Node *current = this;
+        Node *const next() const {
+            auto *current = this;
             if (current->right) {
                 return current->right->min_value_node();
             } else {
@@ -66,8 +66,8 @@ class AvlOrderStatisticTree {
             }
         }
 
-        Node *prev() {
-            Node *current = this;
+        Node *const prev() const {
+            auto *current = this;
             if (current->left) {
                 current->left->max_value_node();
             } else {
@@ -77,6 +77,8 @@ class AvlOrderStatisticTree {
                 return current->parent;
             }
         }
+
+        std::pair<key_type, value_type> get_pair() const { return std::make_pair(key, value); }
     };
 
     class iterator {
@@ -89,6 +91,7 @@ class AvlOrderStatisticTree {
         using const_pointer     = const value_type *;
         using reference         = value_type &;
         using const_reference   = const value_type &;
+        using pair_type         = std::pair<K, V>;
 
       public:
         iterator(Node *ptr = nullptr) : m_ptr(ptr) {}
@@ -125,12 +128,66 @@ class AvlOrderStatisticTree {
             return temp;
         }
 
-        reference operator*() { return *m_ptr; }              // obj
-        const_reference operator*() const { return *m_ptr; }  // const obj
-        pointer operator->() { return m_ptr; }                // ptr
+        pair_type operator*() { return m_ptr->get_pair(); }
+        const pair_type operator*() const { return m_ptr->get_pair(); }
+        pointer operator->() { return m_ptr; }
 
       protected:
         Node *m_ptr = nullptr;
+    };
+
+    class const_iterator {
+      public:
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type        = Node;
+        using size_type         = size_t;
+        using difference_type   = ptrdiff_t;
+        using pointer           = const value_type *;
+        using const_pointer     = const value_type *;
+        using reference         = const value_type &;
+        using const_reference   = const value_type &;
+        using pair_type         = std::pair<K, V>;
+
+      public:
+        const_iterator(const Node *ptr = nullptr) : m_ptr(ptr) {}
+        const_iterator(const const_iterator &other) = default;
+
+        // 允许从 iterator 构造 const_iterator
+        const_iterator(const iterator &other) : m_ptr(other.operator->()) {}
+
+        ~const_iterator() { m_ptr = nullptr; }
+
+        const_iterator &operator=(const const_iterator &other) = default;
+
+        operator bool() const { return m_ptr != nullptr; }
+
+        bool operator==(const const_iterator &other) const { return m_ptr == other.m_ptr; }
+        bool operator!=(const const_iterator &other) const { return m_ptr != other.m_ptr; }
+
+        const_iterator &operator++() {
+            m_ptr = m_ptr->next();
+            return (*this);
+        }
+        const_iterator &operator--() {
+            m_ptr = m_ptr->prev();
+            return (*this);
+        }
+        const_iterator operator++(int) {
+            auto temp(*this);
+            m_ptr = m_ptr->next();
+            return temp;
+        }
+        const_iterator operator--(int) {
+            auto temp(*this);
+            m_ptr = m_ptr->prev();
+            return temp;
+        }
+
+        const pair_type operator*() const { return m_ptr->get_pair(); }
+        const_pointer operator->() const { return m_ptr; }
+
+      protected:
+        const Node *m_ptr = nullptr;
     };
 
   private:
@@ -362,14 +419,19 @@ class AvlOrderStatisticTree {
 
   public:
     AvlOrderStatisticTree(bool (*cmp)(key_type, key_type) = less) : root(nullptr), cmp(cmp) {}
+
     AvlOrderStatisticTree(AvlOrderStatisticTree const &) = delete;
 
     ~AvlOrderStatisticTree() { free(root); }
 
-    void Depose() { free(root); }
-
     iterator begin() { return iterator(root->min_value_node()); }
     iterator end() { return iterator(nullptr); }
+    const_iterator begin() const { return const_iterator(root->min_value_node()); }
+    const_iterator end() const { return const_iterator(nullptr); }
+
+    const_iterator cbegin() const { return const_iterator(root->min_value_node()); }
+    const_iterator cend() const { return const_iterator(nullptr); }
+
     iterator last() { return iterator(root->max_value_node()); }
 
     size_type size() { return size(root); }
@@ -378,8 +440,24 @@ class AvlOrderStatisticTree {
 
     void insert(key_type key, value_type value) { root = insert(root, key, value); }
 
+    AvlOrderStatisticTree &operator=(AvlOrderStatisticTree const &that) {
+        if (&that == this)
+            return *this;
+
+        this->free(this->root);
+
+        this->cmp = that.cmp;
+        // for (auto itor = that.cbegin(); itor != that.cend(); ++itor) {
+        //     this->insert(itor->key, itor->value);
+        // }
+        for (auto &[key, val] : that) {
+            this->insert(key, val);
+        }
+        return *this;
+    }
+
     /**
-     * @note this function will not handle error when key not found
+     * @note this function will not handle error when key not found, use `at` or `find` instead
      */
     reference operator[](key_type const &key) { return find(key)->value; }
 

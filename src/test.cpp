@@ -54,6 +54,17 @@ int main() {
         print_tree_in_key_order(tree);
         tree.print_tree();
 
+        {
+            AvlOrderStatisticTree<int, int> copied_tree;
+            copied_tree = tree;
+            assert(copied_tree.begin() != tree.begin());
+            assert(copied_tree.size() == input.size() - 1);
+            assert(copied_tree.find(target_val_erase) == copied_tree.end());
+
+            print_tree_in_key_order(copied_tree);
+            copied_tree.print_tree();
+        }
+
         cout << "[*] forward tests passed" << endl;
     }
 
