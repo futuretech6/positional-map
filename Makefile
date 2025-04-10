@@ -10,7 +10,7 @@ LIB_DIR := $(TOP)/lib
 BIN_DIR := $(TOP)/bin
 
 CXX := g++
-CXXFALGS := -I$(INC_DIR) -g -std=c++17 -O3 -fsanitize=address
+CXXFLAGS := -I$(INC_DIR) -g -std=c++17 -O3 -fsanitize=address
 
 INCS := $(wildcard $(INC_DIR)/*.h)
 LIBS := $(patsubst $(LIB_DIR)/%.cpp,$(LIB_DIR)/%.o,$(wildcard $(LIB_DIR)/*.cpp))
@@ -18,7 +18,8 @@ BINS := $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%.out,$(wildcard $(SRC_DIR)/*.cpp
 
 default: run
 
-run: build
+run:
+	make -j$(shell nproc) build
 	@for binary in $(BINS); do \
 		echo "\e[32mRunning $$binary\e[0m"; \
 		$$binary; \
@@ -31,9 +32,9 @@ test: $(BIN_DIR)/test.out
 
 build: $(BINS)
 $(BIN_DIR)/%.out: $(SRC_DIR)/%.cpp $(LIBS) $(INCS) | $(BIN_DIR)
-	-$(CXX) $(CXXFALGS) -o $@ $< $(LIBS)
+	-$(CXX) $(CXXFLAGS) -o $@ $< $(LIBS)
 $(LIB_DIR)/%.o: $(LIB_DIR)/%.cpp $(INCS)
-	-$(CXX) $(CXXFALGS) -c -o $@ $<
+	-$(CXX) $(CXXFLAGS) -c -o $@ $<
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
@@ -45,4 +46,4 @@ clean:
 	rm -rf $(BIN_DIR) $(LIBS)
 
 compile_flags.txt: Makefile
-	echo $(CXX) $(CXXFALGS) | sed 's/\s\+/\n/g' > compile_flags.txt
+	echo $(CXX) $(CXXFLAGS) | sed 's/\s\+/\n/g' > compile_flags.txt

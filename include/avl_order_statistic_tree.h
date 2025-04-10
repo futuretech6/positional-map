@@ -1,8 +1,5 @@
 #pragma once
 
-#include <algorithm>
-#include <cstddef>
-#include <functional>
 #include <iostream>
 #include <iterator>
 #include <queue>
@@ -423,6 +420,8 @@ class AvlOrderStatisticTree {
     AvlOrderStatisticTree(AvlOrderStatisticTree const &) = delete;
 
     ~AvlOrderStatisticTree() { free(root); }
+
+    void Depose() { free(root); }
 
     iterator begin() { return iterator(root->min_value_node()); }
     iterator end() { return iterator(nullptr); }
