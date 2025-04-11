@@ -10,7 +10,7 @@ inline void print_tree_in_key_order(AvlOrderStatisticTree<K, V> &tree) {
     using namespace std;
     cout << "key order: {";
     for (auto itor = tree.begin(); itor != tree.end(); ++itor) {
-        cout << itor->key << ": " << itor->value << ", ";
+        cout << itor->first << ": " << itor->second << ", ";
     }
     cout << "}" << endl;
 }
@@ -32,16 +32,16 @@ int main() {
 
         assert(tree.size() == input.size());
 
-        assert(tree.begin()->value == sorted.front());
-        assert(tree.last()->value == sorted.back());
+        assert(tree.begin()->second == sorted.front());
+        assert(tree.last()->second == sorted.back());
 
         for (auto const &val : input) {
-            assert(tree.find(val)->value == val);
+            assert(tree.find(val)->second == val);
             assert(tree[val] == val);
             assert(tree.at(val) == val);
         }
         for (auto pos = tree.BASE_INDEX; pos < n + tree.BASE_INDEX; pos++) {
-            assert(tree.find_by_pos(pos)->value == sorted[pos - tree.BASE_INDEX]);
+            assert(tree.findbypos(pos)->second == sorted[pos - tree.BASE_INDEX]);
         }
 
         print_tree_in_key_order(tree);
@@ -74,8 +74,8 @@ int main() {
             backward_tree.insert(val, val);
         }
 
-        assert(backward_tree.begin()->value == sorted.back());
-        assert(backward_tree.last()->value == sorted.front());
+        assert(backward_tree.begin()->second == sorted.back());
+        assert(backward_tree.last()->second == sorted.front());
 
         print_tree_in_key_order(backward_tree);
         backward_tree.print_tree();

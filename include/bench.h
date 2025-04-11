@@ -39,15 +39,15 @@ Duration measure_find(T &testMap) {
 }
 
 template <typename T>
-Duration measure_find_by_pos(T &testMap) {
+Duration measure_findbypos(T &testMap) {
     auto start_find = std::chrono::high_resolution_clock::now();
     if constexpr (std::is_same<T, SkipList<int, int>>()) {
         for (int pos = 1; pos < testMap.size() + 1; pos++) {
-            volatile auto it = testMap.find_by_pos(pos);
+            volatile auto it = testMap.findbypos(pos);
         }
     } else {
         for (int pos = testMap.BASE_INDEX; pos < testMap.size() + testMap.BASE_INDEX; pos++) {
-            volatile auto it = testMap.find_by_pos(pos);
+            volatile auto it = testMap.findbypos(pos);
         }
     }
     auto end_find = std::chrono::high_resolution_clock::now();
@@ -69,13 +69,13 @@ Duration measure_erase(T &testMap) {
 }
 
 inline void print_time(
-    Duration const &insert, Duration const &find, Duration const &find_by_pos, Duration const &erase,
+    Duration const &insert, Duration const &find, Duration const &findbypos, Duration const &erase,
     unsigned iteration_time
 ) {
     std::cout << "Insertion time (per operation): " << insert.count() / iteration_time << " ns" << std::endl;
     std::cout << "Lookup by key time (per operation): " << find.count() / iteration_time << " ns" << std::endl;
-    if (find_by_pos != INVALID_DURATION) {
-        std::cout << "Lookup by position time (per operation): " << find_by_pos.count() / iteration_time << " ns"
+    if (findbypos != INVALID_DURATION) {
+        std::cout << "Lookup by position time (per operation): " << findbypos.count() / iteration_time << " ns"
                   << std::endl;
     }
     std::cout << "Erase time (per operation): " << erase.count() / iteration_time << " ns" << std::endl;

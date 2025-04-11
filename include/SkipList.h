@@ -64,7 +64,7 @@ class SkipList {
     bool insert(const K &key, const V &v);
     iterator find(const K &key) const;
     V &operator[](const K &key);
-    iterator find_by_pos(int pos) const;
+    iterator findbypos(int pos) const;
     bool erase(const K &key);
     int get_random_level();
     iterator begin() const { return iterator(m_head->next[0]); }
@@ -266,7 +266,7 @@ typename SkipList<K, V>::iterator SkipList<K, V>::find(const K &key) const {
 }
 
 template <typename K, typename V>
-typename SkipList<K, V>::iterator SkipList<K, V>::find_by_pos(int pos) const {
+typename SkipList<K, V>::iterator SkipList<K, V>::findbypos(int pos) const {
     // find the max elem that less than key
     Node<K, V> *current = m_head;
     if (pos > 1) {

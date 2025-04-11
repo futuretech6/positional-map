@@ -52,7 +52,7 @@ int main() {
 
             {
                 cout << "SkipList:" << endl;
-                Duration duration_insert = Duration(0), duration_find = Duration(0), duration_find_by_pos = Duration(0),
+                Duration duration_insert = Duration(0), duration_find = Duration(0), duration_findbypos = Duration(0),
                          duration_erase = Duration(0);
                 for (auto i = iteration_time; i; i--) {
                     SkipList<int, int> skip_list_map;
@@ -60,17 +60,17 @@ int main() {
                     auto random_key = random() % size;
                     assert(skip_list_map[random_key] == random_key);
                     duration_find += measure_find(skip_list_map);
-                    duration_find_by_pos += measure_find_by_pos(skip_list_map);
+                    duration_findbypos += measure_findbypos(skip_list_map);
                     duration_erase += measure_erase(skip_list_map);
                     std::this_thread::sleep_for(SLEEP_TIME);
                 }
-                print_time(duration_insert, duration_find, duration_find_by_pos, duration_erase, iteration_time);
+                print_time(duration_insert, duration_find, duration_findbypos, duration_erase, iteration_time);
                 cout << endl;
             }
 
             {
                 cout << "AvlOrderStatisticTree:" << endl;
-                Duration duration_insert = Duration(0), duration_find = Duration(0), duration_find_by_pos = Duration(0),
+                Duration duration_insert = Duration(0), duration_find = Duration(0), duration_findbypos = Duration(0),
                          duration_erase = Duration(0);
                 for (auto i = iteration_time; i; i--) {
                     AvlOrderStatisticTree<int, int> avl_tree;
@@ -78,11 +78,11 @@ int main() {
                     auto random_key = random() % size;
                     assert(avl_tree[random_key] == random_key);
                     duration_find += measure_find(avl_tree);
-                    duration_find_by_pos += measure_find_by_pos(avl_tree);
+                    duration_findbypos += measure_findbypos(avl_tree);
                     duration_erase += measure_erase(avl_tree);
                     std::this_thread::sleep_for(SLEEP_TIME);
                 }
-                print_time(duration_insert, duration_find, duration_find_by_pos, duration_erase, iteration_time);
+                print_time(duration_insert, duration_find, duration_findbypos, duration_erase, iteration_time);
                 cout << endl;
             }
         }

@@ -8,12 +8,13 @@
 template <typename K, typename V>
 class AvlOrderStatisticTree {
   public:
-    static constexpr int BASE_INDEX = 1;  // the base index of `find_by_pos`
+    static constexpr int BASE_INDEX = 1;  // the base index of `findbypos`
 
   public:
     // Define for some STL usage
     using key_type        = K;
     using value_type      = V;
+    using pair_type       = std::pair<key_type, value_type>;
     using size_type       = size_t;
     using balance_type    = ptrdiff_t;
     using pointer         = value_type *;
@@ -24,16 +25,30 @@ class AvlOrderStatisticTree {
   private:
     class Node {
       public:
-        key_type key;
-        value_type value;
+        // key_type key;
+        // value_type value;
+        pair_type data;
         size_type height, size;
         Node *left, *right, *parent;
 
       public:
         Node(key_type k, value_type v)
-            : key(k), value(v), height(1), size(1), left(nullptr), right(nullptr), parent(nullptr) {}
-
+            : data(std::make_pair(k, v)), height(1), size(1), left(nullptr), right(nullptr), parent(nullptr) {}
         ~Node() {}
+
+        Node &operator=(Node const &other) {
+            if (this == &other)
+                return *this;
+
+            this->data   = std::make_pair(other.data.first, other.data.second);
+            this->height = other.height;
+            this->size   = other.size;
+            this->left   = other.left;
+            this->right  = other.right;
+            this->parent = other.parent;
+
+            return *this;
+        }
 
         Node *min_value_node() {
             Node *current = this;
@@ -74,21 +89,18 @@ class AvlOrderStatisticTree {
                 return current->parent;
             }
         }
-
-        std::pair<key_type, value_type> get_pair() const { return std::make_pair(key, value); }
     };
 
     class iterator {
       public:
         using iterator_category = std::bidirectional_iterator_tag;
-        using value_type        = Node;
+        using value_type        = pair_type;
         using size_type         = size_t;
         using difference_type   = ptrdiff_t;
         using pointer           = value_type *;
         using const_pointer     = const value_type *;
         using reference         = value_type &;
         using const_reference   = const value_type &;
-        using pair_type         = std::pair<K, V>;
 
       public:
         iterator(Node *ptr = nullptr) : m_ptr(ptr) {}
@@ -125,9 +137,9 @@ class AvlOrderStatisticTree {
             return temp;
         }
 
-        pair_type operator*() { return m_ptr->get_pair(); }
-        const pair_type operator*() const { return m_ptr->get_pair(); }
-        pointer operator->() { return m_ptr; }
+        reference operator*() { return m_ptr->data; }
+        const_reference operator*() const { return m_ptr->data; }
+        pointer operator->() { return &m_ptr->data; }
 
       protected:
         Node *m_ptr = nullptr;
@@ -136,14 +148,13 @@ class AvlOrderStatisticTree {
     class const_iterator {
       public:
         using iterator_category = std::bidirectional_iterator_tag;
-        using value_type        = Node;
+        using value_type        = pair_type;
         using size_type         = size_t;
         using difference_type   = ptrdiff_t;
         using pointer           = const value_type *;
         using const_pointer     = const value_type *;
         using reference         = const value_type &;
         using const_reference   = const value_type &;
-        using pair_type         = std::pair<K, V>;
 
       public:
         const_iterator(const Node *ptr = nullptr) : m_ptr(ptr) {}
@@ -180,8 +191,8 @@ class AvlOrderStatisticTree {
             return temp;
         }
 
-        const pair_type operator*() const { return m_ptr->get_pair(); }
-        const_pointer operator->() const { return m_ptr; }
+        const_reference operator*() const { return m_ptr->data; }
+        const_pointer operator->() const { return &m_ptr->data; }
 
       protected:
         const Node *m_ptr = nullptr;
@@ -259,17 +270,17 @@ class AvlOrderStatisticTree {
             return new Node(key, value);
         }
 
-        if (cmp(key, node->key)) {
+        if (cmp(key, node->data.first)) {
             auto new_node    = insert(node->left, key, value);
             node->left       = new_node;
             new_node->parent = node;
-        } else if (cmp(node->key, key)) {
+        } else if (cmp(node->data.first, key)) {
             auto new_node    = insert(node->right, key, value);
             node->right      = new_node;
             new_node->parent = node;
         } else {
             // key already exists, update value
-            node->value = value;
+            node->data.second = value;
             return node;
         }
 
@@ -278,7 +289,7 @@ class AvlOrderStatisticTree {
 
         // rotate
         if (auto balance = get_balance(node); balance > 1) {
-            if (cmp(key, node->left->key)) {
+            if (cmp(key, node->left->data.first)) {
                 // LL
                 return right_rotate(node);
             } else {
@@ -287,7 +298,7 @@ class AvlOrderStatisticTree {
                 return right_rotate(node);
             }
         } else if (balance < -1) {
-            if (cmp(node->right->key, key)) {
+            if (cmp(node->right->data.first, key)) {
                 // RR
                 return left_rotate(node);
             } else {
@@ -306,16 +317,16 @@ class AvlOrderStatisticTree {
             return nullptr;
         }
 
-        if (cmp(key, node->key)) {
+        if (cmp(key, node->data.first)) {
             return find(node->left, key);
         }
-        if (cmp(node->key, key)) {
+        if (cmp(node->data.first, key)) {
             return find(node->right, key);
         }
         return node;
     }
 
-    Node *find_by_pos(Node *const node, size_type const &pos) const {
+    Node *findbypos(Node *const node, size_type const &pos) const {
         auto const left_size = size(node->left);
         auto const root_pos  = left_size + BASE_INDEX;
 
@@ -323,9 +334,9 @@ class AvlOrderStatisticTree {
             return node;
         }
         if (pos < root_pos) {
-            return find_by_pos(node->left, pos);
+            return findbypos(node->left, pos);
         }
-        return find_by_pos(node->right, pos - left_size - 1);
+        return findbypos(node->right, pos - left_size - 1);
     }
 
     /**
@@ -340,9 +351,9 @@ class AvlOrderStatisticTree {
             return nullptr;
         }
 
-        if (cmp(key, node->key)) {
+        if (cmp(key, node->data.first)) {
             node->left = erase(node->left, key);
-        } else if (cmp(node->key, key)) {
+        } else if (cmp(node->data.first, key)) {
             node->right = erase(node->right, key);
         } else {
             if (node->left == nullptr || node->right == nullptr) {
@@ -366,11 +377,11 @@ class AvlOrderStatisticTree {
                 Node *right_min_node = node->right->min_value_node();
 
                 // replace current node with min node
-                node->key   = right_min_node->key;
-                node->value = right_min_node->value;
+                node->data.first  = right_min_node->data.first;
+                node->data.second = right_min_node->data.second;
 
                 // delete min node of right subtree
-                node->right = erase(node->right, right_min_node->key);
+                node->right = erase(node->right, right_min_node->data.first);
             }
         }
 
@@ -447,7 +458,7 @@ class AvlOrderStatisticTree {
 
         this->cmp = that.cmp;
         // for (auto itor = that.cbegin(); itor != that.cend(); ++itor) {
-        //     this->insert(itor->key, itor->value);
+        //     this->insert(itor->data.first, itor->data.second);
         // }
         for (auto &[key, val] : that) {
             this->insert(key, val);
@@ -458,13 +469,20 @@ class AvlOrderStatisticTree {
     /**
      * @note this function will not handle error when key not found, use `at` or `find` instead
      */
-    reference operator[](key_type const &key) { return find(key)->value; }
+    reference operator[](key_type const &key) {
+        if (auto itor = find(key); itor != end()) {
+            return itor->second;
+        } else {
+            insert(key, value_type());
+            return reference(at(key));
+        }
+    }
 
     reference at(key_type const &key) {
         if (auto itor = find(key); itor == end()) {
             throw std::out_of_range("key not found");
         } else {
-            return itor->value;
+            return itor->second;
         }
     }
 
@@ -476,11 +494,11 @@ class AvlOrderStatisticTree {
      * @param pos position of the node to be found
      * @note base index decided by `BASE_INDEX`
      */
-    iterator find_by_pos(size_type const &pos) const {
+    iterator findbypos(size_type const &pos) const {
         if (pos < BASE_INDEX || pos > size(root)) {
             return iterator(nullptr);
         }
-        return iterator(find_by_pos(root, pos));
+        return iterator(findbypos(root, pos));
     }
 
     void erase(key_type key) { root = erase(root, key); }
@@ -510,7 +528,7 @@ class AvlOrderStatisticTree {
             int r      = p.second.first;
             int c      = p.second.second;
 
-            res[r][c] = std::to_string(node->value);
+            res[r][c] = std::to_string(node->data.second);
 
             if (node->left) {
                 q.push({node->left, {r + 1, c - (1 << (height - r - 2))}});
